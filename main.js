@@ -91,6 +91,7 @@ function animate() {
   rotateSun();
   blinkStars();
   rotatePlanets();
+  rotateCameraAuto();
 
   renderer.render(scene, camera);
 }
@@ -210,4 +211,17 @@ function rotatePlanets() {
     planet.position.z =
       planet.userData.distance * Math.sin(planet.userData.angle);
   });
+}
+
+function rotateCameraAuto() {
+  if (!isDragging) {
+    let rotationSpeed = 0.005;
+    scene.rotation.y += rotationSpeed;
+    scene.rotation.x += rotationSpeed * 0.5;
+
+    // change direction interval
+    setInterval(() => {
+      rotationSpeed = Math.random() * 0.01 - 0.005;
+    }, 3_000);
+  }
 }
