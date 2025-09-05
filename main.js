@@ -10,6 +10,30 @@ let planets;
 let isDragging = false;
 let previousMousePosition = { x: 0, y: 0 };
 
+// planets
+const planetData = [
+  { label: "Mercury", color: 0x888888, size: 0.5, distance: 6, speed: 0.02 },
+  { label: "Venus", color: 0xffa500, size: 1.2, distance: 8, speed: 0.015 },
+  { label: "Earth", color: 0x0000ff, size: 1.3, distance: 10, speed: 0.01 },
+  { label: "Mars", color: 0xff0000, size: 0.7, distance: 12, speed: 0.008 },
+  {
+    label: "Jupiter",
+    color: 0xffff00,
+    size: 2.5,
+    distance: 15,
+    speed: 0.006,
+  },
+  { label: "Saturn", color: 0xffd700, size: 2.0, distance: 18, speed: 0.005 },
+  { label: "Uranus", color: 0x00ffff, size: 1.7, distance: 21, speed: 0.004 },
+  {
+    label: "Neptune",
+    color: 0x0000ff,
+    size: 1.6,
+    distance: 24,
+    speed: 0.003,
+  },
+];
+
 init();
 
 function init() {
@@ -158,22 +182,35 @@ function rotateSun() {
 function createPlanets() {
   // create planets
   planets = new THREE.Group();
-  const planetData = [
-    { color: 0x888888, size: 0.5, distance: 6, speed: 0.02 }, // Mercury
-    { color: 0xffa500, size: 1.2, distance: 8, speed: 0.015 }, // Venus
-    { color: 0x0000ff, size: 1.3, distance: 10, speed: 0.01 }, // Earth
-    { color: 0xff0000, size: 0.7, distance: 12, speed: 0.008 }, // Mars
-    { color: 0xffff00, size: 2.5, distance: 15, speed: 0.006 }, // Jupiter
-    { color: 0xffd700, size: 2.0, distance: 18, speed: 0.005 }, // Saturn
-    { color: 0x00ffff, size: 1.7, distance: 21, speed: 0.004 }, // Uranus
-    { color: 0x0000ff, size: 1.6, distance: 24, speed: 0.003 }, // Neptune
-  ];
+
+  // Add planet meshes and labels
   planetData.forEach((data) => {
     const geometry = new THREE.SphereGeometry(data.size, 16, 16);
     const material = new THREE.MeshBasicMaterial({ color: data.color });
     const planet = new THREE.Mesh(geometry, material);
     planet.position.x = data.distance;
     planet.userData = { angle: 0, speed: data.speed, distance: data.distance };
+
+    // Create label using canvas texture
+    const canvas = document.createElement("canvas");
+    canvas.width = 128;
+    canvas.height = 32;
+    const ctx = canvas.getContext("2d");
+    ctx.font = "36px Cursive";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.fillText(data.label, canvas.width / 2, 24);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const labelMaterial = new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+    });
+    const labelSprite = new THREE.Sprite(labelMaterial);
+    labelSprite.scale.set(3, 0.75, 1);
+    labelSprite.position.set(0, data.size + 0.8, 0);
+
+    planet.add(labelSprite);
     planets.add(planet);
   });
   scene.add(planets);
