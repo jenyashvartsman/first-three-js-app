@@ -2,6 +2,7 @@ import * as THREE from "three";
 
 let scene, camera, renderer;
 let sun, sunDots, stars;
+let planets;
 
 init();
 
@@ -24,6 +25,7 @@ function init() {
   // create objects
   createStarField();
   createSun();
+  createPlanets();
 
   // start animation loop
   animate();
@@ -43,6 +45,7 @@ function animate() {
 
   rotateSun();
   blinkStars();
+  rotatePlanets();
 
   renderer.render(scene, camera);
 }
@@ -104,4 +107,62 @@ function createSun() {
 function rotateSun() {
   sunDots.rotation.y += 0.01;
   sunDots.rotation.x += 0.005;
+}
+
+function createPlanets() {
+  // create planets
+  planets = new THREE.Group();
+  const planetData = [
+    { color: 0x888888, size: 0.5, distance: 6, speed: 0.02 }, // Mercury
+    { color: 0xffa500, size: 1.2, distance: 8, speed: 0.015 }, // Venus
+    { color: 0x0000ff, size: 1.3, distance: 10, speed: 0.01 }, // Earth
+    { color: 0xff0000, size: 0.7, distance: 12, speed: 0.008 }, // Mars
+    { color: 0xffff00, size: 2.5, distance: 15, speed: 0.006 }, // Jupiter
+    { color: 0xffd700, size: 2.0, distance: 18, speed: 0.005 }, // Saturn
+    { color: 0x00ffff, size: 1.7, distance: 21, speed: 0.004 }, // Uranus
+    { color: 0x0000ff, size: 1.6, distance: 24, speed: 0.003 }, // Neptune
+  ];
+  planetData.forEach((data) => {
+    const geometry = new THREE.SphereGeometry(data.size, 16, 16);
+    const material = new THREE.MeshBasicMaterial({ color: data.color });
+    const planet = new THREE.Mesh(geometry, material);
+    planet.position.x = data.distance;
+    planet.userData = { angle: 0, speed: data.speed, distance: data.distance };
+    planets.add(planet);
+  });
+  scene.add(planets);
+
+  // initialize planet angles
+  planets.children.forEach((planet) => {
+    planet.userData.angle = Math.random() * Math.PI * 2;
+  });
+
+  // add planets orbits
+  planetData.forEach((data) => {
+    const orbitGeometry = new THREE.RingGeometry(
+      data.distance - 0.1,
+      data.distance + 0.1,
+      128
+    );
+    const orbitMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.5,
+    });
+    const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+    orbit.rotation.x = Math.PI / 2;
+    orbit.position.y = 0.01; // Slightly above the sun's center
+    scene.add(orbit);
+  });
+}
+
+function rotatePlanets() {
+  planets.children.forEach((planet) => {
+    planet.userData.angle += planet.userData.speed;
+    planet.position.x =
+      planet.userData.distance * Math.cos(planet.userData.angle);
+    planet.position.z =
+      planet.userData.distance * Math.sin(planet.userData.angle);
+  });
 }
