@@ -1,8 +1,14 @@
 import * as THREE from "three";
 
 let scene, camera, renderer;
+
+// objects
 let sun, sunDots, stars;
 let planets;
+
+// mouse drag
+let isDragging = false;
+let previousMousePosition = { x: 0, y: 0 };
 
 init();
 
@@ -31,13 +37,52 @@ function init() {
   animate();
 
   // handle window resize
-  window.addEventListener("resize", onWindowResize, false);
+  window.addEventListener("resize", onWindowResize);
+
+  // handle scroll for zoom
+  window.addEventListener("wheel", onWheel);
+
+  // handle mouse drag for rotation
+  window.addEventListener("mousedown", onMouseDown);
+  window.addEventListener("mouseup", onMouseUp);
+  window.addEventListener("mousemove", onMouseMove);
 }
 
 function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+function onWheel(event) {
+  camera.position.z += event.deltaY * 0.05;
+  camera.position.z = Math.max(10, Math.min(100, camera.position.z));
+}
+
+function onMouseDown(event) {
+  isDragging = true;
+  previousMousePosition = { x: event.clientX, y: event.clientY };
+  document.body.style.cursor = "grabbing";
+}
+
+function onMouseUp() {
+  isDragging = false;
+  document.body.style.cursor = "grab";
+}
+
+function onMouseMove(event) {
+  if (isDragging) {
+    const deltaMove = {
+      x: event.clientX - previousMousePosition.x,
+      y: event.clientY - previousMousePosition.y,
+    };
+    const rotationSpeed = 0.005;
+    scene.rotation.y += deltaMove.x * rotationSpeed;
+    scene.rotation.x += deltaMove.y * rotationSpeed;
+    previousMousePosition = { x: event.clientX, y: event.clientY };
+  } else {
+    previousMousePosition = { x: event.clientX, y: event.clientY };
+  }
 }
 
 function animate() {
