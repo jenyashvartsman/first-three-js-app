@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
 let scene, camera, renderer;
-let sun, sunDots;
+let sun, sunDots, stars;
 
 init();
 
@@ -41,24 +41,36 @@ function onWindowResize() {
 function animate() {
   requestAnimationFrame(animate);
 
-  sunDots.rotation.y += 0.01;
-  sunDots.rotation.x += 0.005;
+  rotateSun();
+  blinkStars();
 
   renderer.render(scene, camera);
 }
 
 function createStarField() {
-  for (let i = 0; i < 300; i++) {
-    const starGeometry = new THREE.SphereGeometry(0.1, 8, 8);
-    const starMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const star = new THREE.Mesh(starGeometry, starMaterial);
+  stars = Array(300)
+    .fill()
+    .map(() => {
+      const starGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+      const starMaterial = new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+      });
+      const star = new THREE.Mesh(starGeometry, starMaterial);
 
-    star.position.x = (Math.random() - 0.5) * 250;
-    star.position.y = (Math.random() - 0.5) * 150;
-    star.position.z = (Math.random() - 0.5) * 200;
+      star.position.x = (Math.random() - 0.5) * 250;
+      star.position.y = (Math.random() - 0.5) * 150;
+      star.position.z = (Math.random() - 0.5) * 200;
 
-    scene.add(star);
-  }
+      scene.add(star);
+      return star;
+    });
+}
+
+function blinkStars() {
+  stars.forEach((star) => {
+    star.material.opacity = 0.7 + Math.random() * 0.3;
+  });
 }
 
 function createSun() {
@@ -87,4 +99,9 @@ function createSun() {
     sunDots.add(dot);
   }
   scene.add(sunDots);
+}
+
+function rotateSun() {
+  sunDots.rotation.y += 0.01;
+  sunDots.rotation.x += 0.005;
 }
