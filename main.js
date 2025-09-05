@@ -56,6 +56,7 @@ function init() {
   createStarField();
   createSun();
   createPlanets();
+  createPlanetsOrbits();
 
   // start animation loop
   animate();
@@ -214,13 +215,9 @@ function createPlanets() {
     planets.add(planet);
   });
   scene.add(planets);
+}
 
-  // initialize planet angles
-  planets.children.forEach((planet) => {
-    planet.userData.angle = Math.random() * Math.PI * 2;
-  });
-
-  // add planets orbits
+function createPlanetsOrbits() {
   planetData.forEach((data) => {
     const orbitGeometry = new THREE.RingGeometry(
       data.distance - 0.1,
