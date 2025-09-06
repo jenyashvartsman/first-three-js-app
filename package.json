@@ -2,6 +2,7 @@
   "name": "first-three-js-app",
   "version": "1.0.0",
   "description": "",
+  "homepage": "https://jenyashvartsman.github.io/first-three-js-app",
   "license": "ISC",
   "author": "",
   "type": "commonjs",
@@ -9,12 +10,15 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "three": "^0.179.1"
   },
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "vite": "^6.3.5"
   }
 }
